@@ -2,98 +2,64 @@
 <html>
     <meta http-equiv="refresh" content="25" >
     
-    <head>
+  <head>
+
+      <title>HCIN 720 Assignment- Sangram Pawar</title>
     
-        <title>HCIN 720 Assignment- Sangram Pawar</title>
-    
+      
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="https://www.google.com/jsapi"></script>
 
     
     <script>
 
-      
+     
       function drawChart() {
 
-        var cloud_url = 'https://data.sparkfun.com/output/';
-       
-          // ajax call 
-          
         var public_key = 'AJ5Qwj5z5gh3w6ADb5YA';
-          var jsonData = $.ajax({
-          url:  cloud_url + public_key + '.json',
+
+        // JSONP request
+        var jsonData = $.ajax({
+          url: 'https://data.sparkfun.com/output/' + public_key + '.json',
           data: {page: 1},
           dataType: 'jsonp',
         }).done(function (results) {
-          var latest = results[0];
-          var gauge = new google.visualization.Gauge($('#gauge').get(0));
-          
-            //Gauge data  
-            var gaugeData = google.visualization.arrayToDataTable([
-            ['Label', 'Value'],
-            ['Wind Speed MPH', 0],
-            ['Humidity', 0],
-            
-          ]);
-              
-              // Gauge details.
-          var options = {
-            width: 600,
-            redFrom: 90, redTo: 100,
-            yellowFrom:80, yellowTo: 90,
-            greenFrom:70, greenTo: 80,
-            minorTicks: 5
-          };
-
-          
-
-          // setting the latest values for the parameters
-          gaugeData.setValue(0,1,parseFloat(latest.windspeedmph));
-          gaugeData.setValue(1,1,parseFloat(latest.humidity));
-         
-
-          gauge.draw(gaugeData,options);
 
           var data = new google.visualization.DataTable();
 
           data.addColumn('datetime', 'Time');
-          data.addColumn('number', 'Temp');
           data.addColumn('number', 'Humidity');
-            
+          data.addColumn('number', 'Windspeed (mph)');
 
-        // for loop to reload the data
-            $.each(results, function (i, row) {
+          $.each(results, function (i, row) {
             data.addRow([
               (new Date(row.timestamp)),
-              parseFloat(row.windspeedmph),
               parseFloat(row.humidity),
-             
+              parseFloat(row.windspeedmph),
             ]);
           });
 
-            chart.draw(data, {
+          var chart = new google.visualization.LineChart($('#chart').get(0));
+
+          chart.draw(data, {
             title: 'Weather Report'
           });
 
         });
+
       }
 
-        // Visualization command for google chart. Each chart has different packages
-        
         google.load('visualization', '1', {
-        packages: ['corechart','gauge']
+        packages: ['corechart']
       });
 
-      window.setTimeout(drawChart, 30000);
+      
       google.setOnLoadCallback(drawChart);
-        
+
     </script>
 
   </head>
-  <body style="text-align:center">
-    <h1 >Wireless Weather Monitoring</h1>
-   
-    <div id="gauge" style="width:600px;margin-left:auto;margin-right:auto"></div>
-    <div id="temperature" style="width: 100%;"></div>
+  <body>
+    <div id="chart" style="width: 100%;"></div>
   </body>
-</html> 
+</html>
